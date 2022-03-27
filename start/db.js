@@ -5,7 +5,7 @@ const Fawn = require('fawn');
 
 
 module.exports = function(){
-    mongoose.connect(config.get('dbConnectionString'))
+    mongoose.connect(process.env.MONGODB_URI)
     .then(()=>console.log('Connected...'))
     .catch((err)=>{console.log('Could not Connect',err);})
     //Fawn.init(config.get('dbConnectionString'));
