@@ -1,6 +1,7 @@
 const Fawn = require('fawn');
 const config = require("config");
 
-Fawn.init(process.env.MONGODB_URI);
+  
+//Fawn.init(mongoose);
 
 module.exports = Fawn;

@@ -44,7 +44,7 @@ router.post('/new', async(req,res)=>{
         price
     });
 
-    try{
+    /*try{
         new Fawn.Task()
             .save('bills',bill)
             .update('customers', {_id:customer._id},{
@@ -54,7 +54,12 @@ router.post('/new', async(req,res)=>{
         res.send(bill);
         } catch(ex){
             res.status(500).send(ex);
-        }
+        }*/
+
+    customer.billsBalance= customer.billsBalance + bill.value;
+    let f=await customer.save();
+    let result = await bill.save();
+    res.send(f);
 });
 
 module.exports = router;

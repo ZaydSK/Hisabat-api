@@ -33,7 +33,7 @@ router.post('/new', async(req,res)=>{
         value: req.body.value
     });
 
-    try{
+    /*try{
         new Fawn.Task()
             .save('returns',returned)
             .update('customers', {_id:customer._id},{
@@ -43,11 +43,12 @@ router.post('/new', async(req,res)=>{
         res.send(returned);
         } catch(err){
             res.status(500).send(err);
-        }
+        }*/
 
-
-    // let result = await returned.save();
-    // res.send(result);
+    customer.returnsBalance= customer.returnsBalance + returned.value;
+    let f=await customer.save();
+    let result = await returned.save();
+    res.send(f);
     
 });
 
