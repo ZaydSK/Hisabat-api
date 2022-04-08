@@ -8,15 +8,14 @@ const JOI = require("joi");
 // all products
 router.get('/', async(req,res)=>{
     let products = await Product.find();
-    //res.send(products);
     products = await Promise.all( products.map(async product=>{
         const productPrice = await ProductPrice.findOne({productId:product._id},{},{sort:{date:-1}});
         let temp = product.toJSON();
-        temp.price = productPrice.price;
+        temp.price = productPrice;
         return temp;
         
     }));
-    console.log(products);
+    //console.log(products);
     res.send(products)
 });
 
@@ -24,12 +23,12 @@ router.get('/', async(req,res)=>{
 router.get('/:id', async(req,res)=>{
     const id = validateProductId(req.body);
     if(!id){return res.status(400).send("invalid ID");}
-    const product = await Product.findById(req.params.id);
+    let product = await Product.findById(req.params.id);
     if(!product) return res.status(404).send("Couldn't find product");
     const productPrice = await ProductPrice.findOne({productId:product._id},{},{sort:{date:-1}});
     product = product.toJSON();
     product.price = productPrice.price;
-    return  res.send(product);
+    res.send({price:product.price});
 });
 
 // new product
@@ -67,7 +66,7 @@ router.post('/search', async (req,res)=>{
 router.get('/prices/:id', async(req,res)=>{
     const product = await Product.findById(req.params.id);
     if(!product)  return res.status(404).send('The specified product was not found');
-    return  res.send(await ProductPrice.find({productId:product._id}).sort({date:1}));
+    res.send(await ProductPrice.find({productId:product._id}).sort({date:-1}));
 });
 
 // add new price

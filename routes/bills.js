@@ -32,15 +32,14 @@ router.post('/new', async(req,res)=>{
     }
     const customer = await Customer.findById(req.body.customerId);
     if(!customer) return res.status(404).send('The specified customer was not found');
-    const product = await Product.findOne({productName:req.body.productName});
+    const product = await Product.findOne({productId:req.body.productId});
     if(!product) return res.status(404).send('The specified product was not found');
-    const price = product.price * req.body.amount;
 
     const bill = new Bill({
         customerId: customer._id,
-        productName:req.body.productName,
+        productId:req.body.productId,
         amount: req.body.amount,
-        price
+        price: req.body.price
     });
 
     /*try{
