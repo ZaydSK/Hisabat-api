@@ -58,7 +58,10 @@ router.post('/new', async(req,res)=>{
     customer.billsBalance= customer.billsBalance + bill.price;
     //let f=await customer.save();
     let result = await bill.save();
+    result = result.toJSON();
+    result.customerName = customer.name;
     res.send(result);
+    
 });
 
 module.exports = router;

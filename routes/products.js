@@ -7,7 +7,17 @@ const JOI = require("joi");
 
 // all products
 router.get('/', async(req,res)=>{
-    return  res.send(await Product.find().sort({date:1}));
+    let products = await Product.find();
+    //res.send(products);
+    products = await Promise.all( products.map(async product=>{
+        const productPrice = await ProductPrice.findOne({productId:product._id},{},{sort:{date:-1}});
+        let temp = product.toJSON();
+        temp.price = productPrice.price;
+        return temp;
+        
+    }));
+    console.log(products);
+    res.send(products)
 });
 
 // one product
@@ -16,6 +26,9 @@ router.get('/:id', async(req,res)=>{
     if(!id){return res.status(400).send("invalid ID");}
     const product = await Product.findById(req.params.id);
     if(!product) return res.status(404).send("Couldn't find product");
+    const productPrice = await ProductPrice.findOne({productId:product._id},{},{sort:{date:-1}});
+    product = product.toJSON();
+    product.price = productPrice.price;
     return  res.send(product);
 });
 
@@ -30,6 +43,11 @@ router.post('/', async(req,res)=>{
         price:req.body.price
     });
     let result = await product.save();
+    const productPrice = new ProductPrice({
+        productId: result._id,
+        price:req.body.price
+    });
+    result =await productPrice.save();
     res.send(result);
     
 });

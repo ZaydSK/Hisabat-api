@@ -30,7 +30,7 @@ router.post('/new', async(req,res)=>{
     }
     const customer = await Customer.findById(req.body.customerId);
     if(!customer) return res.status(404).send('The specified customer was not found');
-
+    
     const payment = new Payment({
         customerId: customer._id,
         value: req.body.value
@@ -51,9 +51,11 @@ router.post('/new', async(req,res)=>{
     // let result = await payment.save();
     // res.send(result);
     customer.paymentsBalance= customer.paymentsBalance + payment.value;
-    let f=await customer.save();
+    await customer.save();
     let result = await payment.save();
-    res.send(f);
+    result = result.toJSON();
+    result.customerName = customer.name;
+    res.send(result);
     
 });
 
