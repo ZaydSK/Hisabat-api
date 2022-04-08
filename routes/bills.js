@@ -40,7 +40,6 @@ router.post('/new', async(req,res)=>{
         customerId: customer._id,
         productName:req.body.productName,
         amount: req.body.amount,
-        value: req.body.value,
         price
     });
 
@@ -56,10 +55,10 @@ router.post('/new', async(req,res)=>{
             res.status(500).send(ex);
         }*/
 
-    customer.billsBalance= customer.billsBalance + bill.value;
-    let f=await customer.save();
+    customer.billsBalance= customer.billsBalance + bill.price;
+    //let f=await customer.save();
     let result = await bill.save();
-    res.send(f);
+    res.send(result);
 });
 
 module.exports = router;
