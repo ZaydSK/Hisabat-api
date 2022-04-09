@@ -5,7 +5,7 @@ JOI.ObjectId = require('joi-objectid')(JOI);
 const ProductPrice = mongoose.model('ProductPrice', new mongoose.Schema({
     productId: {type: mongoose.Schema.Types.ObjectId , ref:"Product", required: true},
     price: {type:Number, required: true, default:0, min:0},
-    date: {type:Date, default:Date.now()} 
+    date: {type:Date, default:Date.now} 
 }) );
 
 function validateProductPrice(product){

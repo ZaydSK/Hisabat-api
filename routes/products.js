@@ -44,7 +44,8 @@ router.post('/', async(req,res)=>{
     let result = await product.save();
     const productPrice = new ProductPrice({
         productId: result._id,
-        price:req.body.price
+        price:req.body.price,
+        date: Date.now()
     });
     result =await productPrice.save();
     res.send(result);
@@ -73,12 +74,13 @@ router.get('/prices/:id', async(req,res)=>{
 router.post('/prices/:id', async(req,res)=>{
    const {error} = validatePrice(req.body);
    if(error){ return res.status(400).send(error.details[0].message);}
-    const product = Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
     if(!product) return res.status(404).send('The specified product was not found');
     console.log(product);
     const productPrice = new ProductPrice({
         productId: req.params.id,
-        price:req.body.price
+        price:req.body.price,
+        date: Date.now()
     });
     let result = await productPrice.save();
     res.send(result);
@@ -90,7 +92,6 @@ function validateSearch(input){
     const Schema = JOI.object({
         name: JOI.string().required(),
     });
-    //console.log(Schema);
     return Schema.validate(input);
 }
 

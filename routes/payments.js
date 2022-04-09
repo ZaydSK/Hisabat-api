@@ -19,7 +19,13 @@ router.post('/', async(req,res)=>{
      }
 
 
-    return  res.send(await Payment.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1}));
+    let payments = (await Payment.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1}));
+    res.send(await Promise.all( payments.map(async payment=>{
+        let temp = payment.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        return temp;
+    })
+    ));
 });
 
 // new payment
@@ -33,7 +39,8 @@ router.post('/new', async(req,res)=>{
     
     const payment = new Payment({
         customerId: customer._id,
-        value: req.body.value
+        value: req.body.value,
+        date: Date.now()
     });
 
     /*try{

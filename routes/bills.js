@@ -19,7 +19,14 @@ router.post('/', async(req,res)=>{
      }
 
     
-    res.send (await Bill.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1}));
+    let bills =(await Bill.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1}));
+    res.send(await Promise.all( bills.map(async bill=>{
+        let temp = bill.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        temp.product = await Product.findById(temp.productId,'name -_id');
+        return temp;
+    })
+    ));
     
     
 });
@@ -39,23 +46,11 @@ router.post('/new', async(req,res)=>{
         customerId: customer._id,
         productId:req.body.productId,
         amount: req.body.amount,
-        price: req.body.price
+        price: req.body.price,
+        date: Date.now()
     });
 
-    /*try{
-        new Fawn.Task()
-            .save('bills',bill)
-            .update('customers', {_id:customer._id},{
-                $inc:{billsBalance:price}
-            })
-        .run();
-        res.send(bill);
-        } catch(ex){
-            res.status(500).send(ex);
-        }*/
-
     customer.billsBalance= customer.billsBalance + bill.price;
-    //let f=await customer.save();
     let result = await bill.save();
     result = result.toJSON();
     result.customerName = customer.name;

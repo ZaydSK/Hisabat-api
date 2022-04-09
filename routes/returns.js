@@ -16,7 +16,13 @@ router.post('/', async(req,res)=>{
         dateTo = new Date(req.body.to);
      }
 
-    res.send(await Return.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1}));
+    let returns = await Return.find({date:{$gte:dateFrom, $lte:dateTo}}).sort({date:-1});
+    res.send(await Promise.all( returns.map(async returned=>{
+        let temp = returned.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        return temp;
+    })
+    ));
 });
 
 // new return
@@ -30,20 +36,9 @@ router.post('/new', async(req,res)=>{
 
     const returned = new Return({
         customerId: customer._id,
-        value: req.body.value
+        value: req.body.value,
+        date: Date.now()
     });
-
-    /*try{
-        new Fawn.Task()
-            .save('returns',returned)
-            .update('customers', {_id:customer._id},{
-                $inc:{returnsBalance:returned.value}
-            })
-        .run();
-        res.send(returned);
-        } catch(err){
-            res.status(500).send(err);
-        }*/
 
     customer.returnsBalance= customer.returnsBalance + returned.value;
     let result = await returned.save();
