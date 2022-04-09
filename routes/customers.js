@@ -44,9 +44,26 @@ router.post('/search', async (req,res)=>{
 
 // get all processes
 router.get('/:id', async(req,res)=>{
-    const bills = await Bill.find({customerId:req.params.id});
-    const payments = await Payment.find({customerId:req.params.id});
-    const returns = await Return.find({customerId:req.params.id});
+    let bills = await Bill.find({customerId:req.params.id});
+    let payments = await Payment.find({customerId:req.params.id});
+    let returns = await Return.find({customerId:req.params.id});
+    bills = await Promise.all( bills.map(async bill=>{
+        let temp = bill.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        temp.product = await Product.findById(temp.productId,'name -_id');
+        return temp;
+    }));
+    payments = await Promise.all( payments.map(async payment=>{
+        let temp = payment.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        return temp;
+    }));
+    returns = await Promise.all( returns.map(async returned=>{
+        let temp = returned.toJSON();
+        temp.customer = await Customer.findById(temp.customerId,'name -_id');
+        return temp;
+    }));
+        
     let result =[];
     result =result.concat(bills,payments,returns);
     result.sort(( a, b ) =>{
