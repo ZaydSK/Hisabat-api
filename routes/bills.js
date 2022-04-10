@@ -51,6 +51,7 @@ router.post('/new', async(req,res)=>{
     });
 
     customer.billsBalance= customer.billsBalance + bill.price;
+    await customer.save();
     let result = await bill.save();
     result = result.toJSON();
     result.customerName = customer.name;

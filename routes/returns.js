@@ -41,6 +41,7 @@ router.post('/new', async(req,res)=>{
     });
 
     customer.returnsBalance= customer.returnsBalance + returned.value;
+    await customer.save();
     let result = await returned.save();
     result = result.toJSON();
     result.customerName = customer.name;

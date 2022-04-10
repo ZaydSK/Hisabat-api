@@ -43,20 +43,6 @@ router.post('/new', async(req,res)=>{
         date: Date.now()
     });
 
-    /*try{
-        new Fawn.Task()
-            .save('payments',payment)
-            .update('customers', {_id:customer._id},{
-                $inc:{paymentsBalance:payment.value}
-            })
-        .run();
-        res.send(payment);
-        } catch(ex){
-            res.status(500).send("Failed");
-        }*/
-
-    // let result = await payment.save();
-    // res.send(result);
     customer.paymentsBalance= customer.paymentsBalance + payment.value;
     await customer.save();
     let result = await payment.save();
